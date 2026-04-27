@@ -1,0 +1,84 @@
+name: akom_scanner
+description: "Application mobile Akôm Scanner — Catalogue, Inventaire, Caisse."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State management
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.5.1
+
+  # Navigation
+  go_router: ^14.8.1
+
+  # HTTP
+  dio: ^5.8.0
+
+  # Auth & Backend
+  supabase_flutter: ^2.9.0
+
+  # Base de données locale offline (SQLite)
+  drift: ^2.22.1
+  drift_flutter: ^0.2.4
+  sqlite3_flutter_libs: ^0.5.26
+
+  # Scanner code-barres
+  mobile_scanner: ^6.0.10
+
+  # QR code
+  qr_flutter: ^4.1.0
+
+  # PDF & impression
+  pdf: ^3.11.1
+  printing: ^5.14.0
+
+  # Impression thermique Bluetooth — ajoutés en Phase 8
+  # flutter_thermal_printer: ^x.x.x
+  # esc_pos_utils_plus: ^x.x.x
+
+  # Stockage local léger
+  shared_preferences: ^2.3.5
+
+  # Connectivité réseau
+  connectivity_plus: ^6.1.3
+
+  # Internationalisation & formatage
+  intl: ^0.19.0
+
+  # Images
+  cached_network_image: ^3.4.1
+  image_picker: ^1.1.2
+
+  # Ouverture de liens externes
+  url_launcher: ^6.3.1
+
+  # Code generation (modèles)
+  freezed_annotation: ^3.0.0
+  json_annotation: ^4.9.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+  # Code generation
+  build_runner: ^2.4.15
+  freezed: ^3.0.0
+  json_serializable: ^6.9.4
+  riverpod_generator: ^2.6.3
+  drift_dev: ^2.22.1
+
+  # Linting
+  custom_lint: ^0.7.5
+  riverpod_lint: ^2.6.3
+
+flutter:
+  uses-material-design: true
