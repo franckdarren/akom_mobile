@@ -16,26 +16,16 @@ import 'features/catalog/presentation/product_form_screen.dart';
 import 'features/catalog/presentation/qr_label_screen.dart';
 import 'features/catalog/presentation/scanner_screen.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
+import 'features/inventory/presentation/inventory_screen.dart';
+import 'features/inventory/presentation/inventory_summary_screen.dart';
+import 'features/inventory/presentation/scan_count_screen.dart';
+import 'features/pos/presentation/cart_screen.dart';
+import 'features/pos/presentation/payment_screen.dart';
+import 'features/pos/presentation/pos_screen.dart';
+import 'features/pos/presentation/receipt_screen.dart';
+import 'features/settings/presentation/printer_settings_screen.dart';
+import 'features/settings/presentation/settings_screen.dart';
 import 'shared/theme/app_theme.dart';
-
-// Placeholders — remplacés en Phases 6, 7
-class _InventoryPlaceholder extends StatelessWidget {
-  const _InventoryPlaceholder();
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('Inventaire')),
-        body: const Center(child: Text('Inventaire — Phase 6')),
-      );
-}
-
-class _PosPlaceholder extends StatelessWidget {
-  const _PosPlaceholder();
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('Caisse')),
-        body: const Center(child: Text('Caisse — Phase 7')),
-      );
-}
 
 final _routerProvider = Provider<GoRouter>((ref) {
   final authNotifier = ref.watch(routerAuthNotifierProvider);
@@ -106,11 +96,47 @@ final _routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/inventory',
-        builder: (context, state) => const _InventoryPlaceholder(),
+        builder: (_, _) => const InventoryScreen(),
+        routes: [
+          GoRoute(
+            path: 'scan',
+            builder: (_, _) => const ScanCountScreen(),
+          ),
+          GoRoute(
+            path: 'summary',
+            builder: (_, _) => const InventorySummaryScreen(),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/settings',
+        builder: (_, _) => const SettingsScreen(),
+        routes: [
+          GoRoute(
+            path: 'printer',
+            builder: (_, _) => const PrinterSettingsScreen(),
+          ),
+        ],
       ),
       GoRoute(
         path: '/pos',
-        builder: (context, state) => const _PosPlaceholder(),
+        builder: (_, _) => const PosScreen(),
+        routes: [
+          GoRoute(
+            path: 'cart',
+            builder: (_, _) => const CartScreen(),
+          ),
+          GoRoute(
+            path: 'payment',
+            builder: (_, _) => const PaymentScreen(),
+          ),
+          GoRoute(
+            path: 'receipt',
+            builder: (_, state) => ReceiptScreen(
+              extra: state.extra! as Map<String, dynamic>,
+            ),
+          ),
+        ],
       ),
     ],
   );

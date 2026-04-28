@@ -156,6 +156,8 @@ class _ScanCountScreenState extends ConsumerState<ScanCountScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Précharge le stock dès l'ouverture de l'écran
+    ref.watch(stockProvider);
     final session = ref.watch(inventorySessionProvider);
 
     return Scaffold(
@@ -198,6 +200,7 @@ class _ScanCountScreenState extends ConsumerState<ScanCountScreen>
                 error: _qtyError,
                 onValidate: _validate,
                 onCancel: _cancelCurrent,
+                onChanged: () => setState(() {}),
               )
             : Stack(
                 children: [
@@ -252,6 +255,7 @@ class _CountEntryPanel extends StatelessWidget {
     required this.focusNode,
     required this.onValidate,
     required this.onCancel,
+    required this.onChanged,
     this.error,
   });
 
@@ -261,6 +265,7 @@ class _CountEntryPanel extends StatelessWidget {
   final String? error;
   final VoidCallback onValidate;
   final VoidCallback onCancel;
+  final VoidCallback onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -319,7 +324,7 @@ class _CountEntryPanel extends StatelessWidget {
               suffixText: 'unités',
             ),
             onSubmitted: (_) => onValidate(),
-            onChanged: (_) {},
+            onChanged: (_) => onChanged(),
           ),
           if (gap != null) ...[
             const SizedBox(height: AkomSpacing.sm),

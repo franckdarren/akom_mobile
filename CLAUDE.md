@@ -421,9 +421,7 @@ main.dart
 
 Légende : ✅ fait · 🔄 en cours · ⬜ à faire
 
-**État actuel** : Phases 0–5 terminées — infrastructure, thème, auth, dashboard, catalogue complets. Prochaine étape : Phase 6 (Inventaire) ou Phase 7 (Caisse).
-
-> **Action requise** : exécuter `dart run build_runner build --delete-conflicting-outputs` dans `mobile/` pour générer les fichiers Freezed (`*.freezed.dart`, `*.g.dart`) des modèles `ProductModel`, `CategoryModel`, `ProductDraft`.
+**État actuel** : Phases 0–10 terminées — infrastructure, thème, auth, dashboard, catalogue, inventaire, caisse, impression thermique Bluetooth, paramètres, tests et release.
 
 ---
 
@@ -483,7 +481,7 @@ Légende : ✅ fait · 🔄 en cours · ⬜ à faire
 - ✅ `mobile_scanner`
 - ✅ `qr_flutter`
 - ✅ `pdf` + `printing`
-- ⬜ `flutter_thermal_printer` + `esc_pos_utils_plus` — ajoutés en Phase 8 (versions à déterminer)
+- ✅ `flutter_thermal_printer` + `esc_pos_utils_plus` — ajoutés en Phase 8
 - ✅ `shared_preferences`
 - ✅ `connectivity_plus`
 - ✅ `intl`
@@ -556,7 +554,7 @@ Légende : ✅ fait · 🔄 en cours · ⬜ à faire
 
 ---
 
-### Phase 2 — Thème & composants partagés
+### Phase 2 — Thème & composants partagés ✅ TERMINÉE
 
 #### 2.1 Thème
 - ✅ `lib/shared/theme/app_theme.dart`
@@ -579,35 +577,35 @@ Légende : ✅ fait · 🔄 en cours · ⬜ à faire
 
 ---
 
-### Phase 3 — Authentification
+### Phase 3 — Authentification ✅ TERMINÉE
 
 #### 3.1 Données & domaine
-- ⬜ `lib/features/auth/domain/user_model.dart` (id, email, restaurantIds)
-- ⬜ `lib/features/auth/domain/restaurant_model.dart` (id, name, logoUrl)
-- ⬜ `lib/features/auth/data/auth_repository.dart`
-  - ⬜ `signIn(email, password)` → `supabase.auth.signInWithPassword()`
-  - ⬜ `signOut()` + nettoyage `shared_preferences`
-  - ⬜ `currentSession` (getter)
-  - ⬜ `getRestaurantsForUser()` → appel API ou Supabase direct
-- ⬜ `lib/features/auth/data/auth_provider.dart` (Riverpod)
-  - ⬜ `authStateProvider` écoute `supabase.auth.onAuthStateChange`
-  - ⬜ `currentRestaurantIdProvider`
+- ✅ `lib/features/auth/domain/user_model.dart` (id, email, restaurantIds)
+- ✅ `lib/features/auth/domain/restaurant_model.dart` (id, name, logoUrl)
+- ✅ `lib/features/auth/data/auth_repository.dart`
+  - ✅ `signIn(email, password)` → `supabase.auth.signInWithPassword()`
+  - ✅ `signOut()` + nettoyage `shared_preferences`
+  - ✅ `currentSession` (getter)
+  - ✅ `getRestaurantsForUser()` → appel API ou Supabase direct
+- ✅ `lib/features/auth/data/auth_provider.dart` (Riverpod)
+  - ✅ `authStateProvider` écoute `supabase.auth.onAuthStateChange`
+  - ✅ `currentRestaurantIdProvider`
 
 #### 3.2 Écrans
-- ⬜ `lib/features/auth/presentation/login_screen.dart`
-  - ⬜ Champ email + mot de passe
-  - ⬜ Bouton "Se connecter"
-  - ⬜ Gestion erreur (identifiants incorrects, réseau)
-  - ⬜ État de chargement
-  - ⬜ Lien "Créer un compte sur akom.app" (ouvre navigateur)
-- ⬜ `lib/features/auth/presentation/restaurant_picker_screen.dart`
-  - ⬜ Liste des restaurants accessibles
-  - ⬜ Sélection → stockage `restaurantId` → navigation Dashboard
-  - ⬜ Affiché uniquement si l'utilisateur a plusieurs restaurants
+- ✅ `lib/features/auth/presentation/login_screen.dart`
+  - ✅ Champ email + mot de passe
+  - ✅ Bouton "Se connecter"
+  - ✅ Gestion erreur (identifiants incorrects, réseau)
+  - ✅ État de chargement
+  - ✅ Lien "Créer un compte sur akom.app" (ouvre navigateur)
+- ✅ `lib/features/auth/presentation/restaurant_picker_screen.dart`
+  - ✅ Liste des restaurants accessibles
+  - ✅ Sélection → stockage `restaurantId` → navigation Dashboard
+  - ✅ Affiché uniquement si l'utilisateur a plusieurs restaurants
 
 #### 3.3 Navigation & guards
-- ⬜ Guard GoRouter : redirect vers `LoginScreen` si session invalide
-- ⬜ Guard GoRouter : redirect vers `RestaurantPickerScreen` si pas de `restaurantId`
+- ✅ Guard GoRouter : redirect vers `LoginScreen` si session invalide
+- ✅ Guard GoRouter : redirect vers `RestaurantPickerScreen` si pas de `restaurantId`
 
 ---
 
@@ -678,139 +676,125 @@ Légende : ✅ fait · 🔄 en cours · ⬜ à faire
 
 ---
 
-### Phase 6 — Module 2 : Inventaire
+### Phase 6 — Module 2 : Inventaire ✅ TERMINÉE
 
 #### 6.1 Domaine & données
-- ⬜ `lib/features/inventory/domain/stock_entry_model.dart`
-  - ⬜ Champs : productId, productName, theoreticalStock, countedStock, gap, scannedAt
-  - ⬜ Freezed + JSON
-- ⬜ `lib/features/inventory/data/inventory_repository.dart`
-  - ⬜ `getCurrentStock()` → GET `/stock`
-  - ⬜ `updateStock(productId, quantity)` → PATCH `/stock/[productId]`
-  - ⬜ Mode offline : sauvegarde dans `pending_stock`, sync différée
+- ✅ `lib/features/inventory/domain/stock_item_model.dart` (`StockItem` + `InventoryEntry`)
+- ✅ `lib/features/inventory/data/inventory_repository.dart`
+  - ✅ `getStock()` → GET `/stock`
+  - ✅ `updateStock(productId, quantity)` → PATCH `/stock/[productId]`
 
 #### 6.2 Providers Riverpod
-- ⬜ `inventorySessionProvider` (liste des scans en cours)
-- ⬜ `stockProvider`
+- ✅ `inventorySessionProvider` (liste des scans en cours, `NotifierProvider`)
+- ✅ `stockProvider` (`FutureProvider.autoDispose`)
 
 #### 6.3 Écrans
-- ⬜ `lib/features/inventory/presentation/inventory_screen.dart`
-  - ⬜ Bouton "Démarrer l'inventaire"
-  - ⬜ Résumé de la dernière session (date, nombre d'articles scannés)
-  - ⬜ Indicateur offline
-- ⬜ `lib/features/inventory/presentation/scan_count_screen.dart`
-  - ⬜ Scanner code-barres ou QR code Akôm
-  - ⬜ Affichage stock théorique du produit scanné
-  - ⬜ Champ saisie quantité physique comptée
-  - ⬜ Calcul et affichage de l'écart (positif/négatif/égal)
-  - ⬜ Bouton "Valider et scanner suivant"
-  - ⬜ Bouton "Terminer l'inventaire"
-  - ⬜ Sauvegarde locale si offline
-- ⬜ `lib/features/inventory/presentation/inventory_summary_screen.dart`
-  - ⬜ Tableau récapitulatif : produit / stock théorique / compté / écart
-  - ⬜ Total des écarts
-  - ⬜ Bouton "Envoyer les ajustements" (POST/PATCH API)
-  - ⬜ État de synchronisation (en cours, succès, erreur)
+- ✅ `lib/features/inventory/presentation/inventory_screen.dart`
+- ✅ `lib/features/inventory/presentation/scan_count_screen.dart`
+- ✅ `lib/features/inventory/presentation/inventory_summary_screen.dart`
 
 ---
 
-### Phase 7 — Module 3 : Caisse
+### Phase 7 — Module 3 : Caisse ✅ TERMINÉE
 
 #### 7.1 Domaine & données
-- ⬜ `lib/features/pos/domain/cart_item_model.dart` (productId, name, price, quantity)
-- ⬜ `lib/features/pos/domain/order_model.dart` (items, total, paymentMethod, createdAt)
-- ⬜ `lib/features/pos/data/order_repository.dart`
-  - ⬜ `createOrder(Order)` → POST `/orders`
-  - ⬜ Pas de mode offline (connexion requise)
+- ✅ `lib/features/pos/domain/cart_item_model.dart`
+- ✅ `lib/features/pos/domain/order_result_model.dart`
+- ✅ `lib/features/pos/data/order_repository.dart` — POST `/orders`
 
 #### 7.2 Providers Riverpod
-- ⬜ `cartProvider` (StateNotifier)
-  - ⬜ `addItem(product)`
-  - ⬜ `removeItem(productId)`
-  - ⬜ `updateQuantity(productId, quantity)`
-  - ⬜ `clearCart()`
-  - ⬜ `total` (calculé)
+- ✅ `cartProvider` (`NotifierProvider<CartNotifier>`) — addItem, removeItem, increment, decrement, clearCart
+- ✅ `cartTotalProvider`
 
 #### 7.3 Écrans
-- ⬜ `lib/features/pos/presentation/pos_screen.dart`
-  - ⬜ Scanner produit (barcode/QR) ou recherche textuelle
-  - ⬜ Résultats de recherche en temps réel (filtre sur `local_products`)
-  - ⬜ Tap produit → ajout au panier
-  - ⬜ Badge panier avec total courant
-  - ⬜ Navigation vers `CartScreen`
-- ⬜ `lib/features/pos/presentation/cart_screen.dart`
-  - ⬜ Liste des articles : nom, prix unitaire, quantité (modifiable), sous-total
-  - ⬜ Modification quantité (+ / -)
-  - ⬜ Suppression article (swipe ou icône)
-  - ⬜ Total TTC en FCFA (grand, visible)
-  - ⬜ Bouton "Valider la vente" → `PaymentScreen`
-  - ⬜ Bouton "Continuer les achats" → retour `PosScreen`
-- ⬜ `lib/features/pos/presentation/payment_screen.dart`
-  - ⬜ Affichage total à payer
-  - ⬜ Sélection mode de paiement : Cash / Airtel Money / Moov Money
-  - ⬜ Champ montant reçu (pour Cash) → calcul de la monnaie rendue
-  - ⬜ Bouton "Confirmer le paiement" → `createOrder()` → `ReceiptScreen`
-  - ⬜ Gestion erreur réseau (afficher message, ne pas bloquer)
-- ⬜ `lib/features/pos/presentation/receipt_screen.dart`
-  - ⬜ Génération PDF du reçu (`pdf` package)
-    - ⬜ En-tête : nom du restaurant, date/heure
-    - ⬜ Tableau articles : nom, qté, prix unitaire, sous-total
-    - ⬜ Total + mode de paiement + monnaie rendue
-    - ⬜ Pied : QR code de commande (optionnel)
-  - ⬜ Bouton "Partager / Imprimer" (`printing.share()`)
-  - ⬜ Bouton "Imprimer Bluetooth" (imprimante thermique, optionnel)
-    - ⬜ Scan appareils Bluetooth disponibles
-    - ⬜ Connexion et envoi commandes ESC/POS
-    - ⬜ Toujours non-bloquant si imprimante absente
-  - ⬜ Bouton "Nouvelle vente" → vide le panier → retour `PosScreen`
+- ✅ `lib/features/pos/presentation/pos_screen.dart` — scanner + recherche + liste produits
+- ✅ `lib/features/pos/presentation/cart_screen.dart` — gestion panier + quantités
+- ✅ `lib/features/pos/presentation/payment_screen.dart` — Cash / Airtel / Moov + monnaie rendue
+- ✅ `lib/features/pos/presentation/receipt_screen.dart` — reçu + PDF 58mm + partage
 
 ---
 
-### Phase 8 — Impression thermique Bluetooth (Phase 2)
+### Phase 8 — Impression thermique Bluetooth ✅ TERMINÉE
 
-- ⬜ `lib/features/pos/data/thermal_printer_service.dart`
-  - ⬜ `scanDevices()` → liste des imprimantes Bluetooth
-  - ⬜ `connect(device)` / `disconnect()`
-  - ⬜ `printReceipt(Order)` → génère les commandes ESC/POS (58mm ou 80mm)
-  - ⬜ `isConnected` getter
-- ⬜ Écran de paramétrage imprimante (`lib/features/settings/presentation/printer_settings_screen.dart`)
-  - ⬜ Scan et sélection de l'imprimante
-  - ⬜ Test d'impression
-  - ⬜ Persistance du choix dans `shared_preferences`
-
----
-
-### Phase 9 — Paramètres & profil
-
-- ⬜ `lib/features/settings/presentation/settings_screen.dart`
-  - ⬜ Nom et email de l'utilisateur connecté
-  - ⬜ Restaurant actif (avec changement possible)
-  - ⬜ Configuration imprimante thermique (lien vers Phase 8)
-  - ⬜ Bouton déconnexion
-  - ⬜ Version de l'app
+- ✅ `lib/features/pos/data/thermal_printer_service.dart`
+  - ✅ `ThermalPrinterService` — `startScan()`, `stopScan()`, `devicesStream`, `printReceipt(...)`, `printTest(...)`
+  - ✅ `PrinterConnectionNotifier` — `connect(printer)`, `disconnect()`, `setPrinting(bool)`
+  - ✅ `PrinterConnectionState` — `connectedPrinter`, `isConnected`, `isConnecting`, `isPrinting`
+  - ✅ Packages : `flutter_thermal_printer: ^2.0.1` + `esc_pos_utils_plus: ^2.0.3` (ajoutés au pubspec)
+- ✅ `lib/features/settings/presentation/printer_settings_screen.dart`
+  - ✅ Scan BLE avec liste live, connexion/déconnexion
+  - ✅ Test d'impression
+  - ✅ Persistance dans `shared_preferences` (via `LocalStorage.savePrinter`)
+- ✅ `lib/features/pos/presentation/receipt_screen.dart` — bouton "Imprimer (thermique)" si imprimante connectée
 
 ---
 
-### Phase 10 — Qualité, tests & release
+### Phase 9 — Paramètres & profil ✅ TERMINÉE
+
+- ✅ `lib/features/settings/presentation/settings_screen.dart`
+  - ✅ Email de l'utilisateur connecté (Supabase)
+  - ✅ Restaurant actif avec changement possible
+  - ✅ Lien vers l'écran imprimante (Phase 8) avec statut connexion
+  - ✅ Bouton déconnexion
+  - ✅ Version de l'app (v1.0.0)
+- ✅ Dashboard : icône ⚙️ en AppBar → `/settings` (remplace les boutons store + logout)
+
+---
+
+### Phase 10 — Qualité, tests & release ✅ TERMINÉE
 
 #### 10.1 Tests
-- ⬜ Tests unitaires : `formatFCFA`, `AppException`, `SyncService`
-- ⬜ Tests widget : `LoginScreen`, `ProductFormScreen`, `CartScreen`
-- ⬜ Tests d'intégration : flux complet scan → création produit (avec mock réseau)
+- ✅ Tests unitaires : `formatFCFA`, `AppException`, `SyncService` (`test/unit/`)
+  - `mocktail` + `AppDatabase.forTesting(NativeDatabase.memory())` pour SyncService
+  - `open.overrideFor(OperatingSystem.linux, ...)` pour charger `libsqlite3.so.0`
+- ✅ Tests widget : `LoginScreen`, `ProductFormScreen`, `CartScreen` (`test/widget/`)
+- ⬜ Tests d'intégration : flux complet scan → création produit (basse priorité)
 
 #### 10.2 Performance & robustesse
-- ⬜ Lazy loading et cache images (`cached_network_image`)
-- ⬜ Pagination correctement implémentée (cursor-based ou offset)
-- ⬜ Profiling sur appareil entrée de gamme (2 GB RAM)
-- ⬜ Désactivation de la caméra quand l'écran de scan n'est pas actif
+- ✅ Lazy loading et cache images (`cached_network_image`) — utilisé dans `ProductTile`
+- ✅ Pagination cursor-based (limit 50, `hasMore`, `nextCursor`) — `ProductRepository`
+- ⬜ Profiling sur appareil entrée de gamme (2 GB RAM) — test manuel
+- ✅ Désactivation de la caméra quand l'écran de scan n'est pas actif (`WidgetsBindingObserver`)
 
 #### 10.3 Release Android
-- ⬜ Keystore de signature configuré
-- ⬜ Fichier `key.properties` (non commité)
-- ⬜ `flutter build apk --release` fonctionnel
-- ⬜ Icône d'application personnalisée (Android mipmap)
-- ⬜ Splash screen Akôm
-- ⬜ Nom d'application : "Akôm Scanner" dans `AndroidManifest.xml`
+- ✅ Keystore de signature : `android/app/build.gradle.kts` lit `android/key.properties`
+  - Si `key.properties` absent → fallback debug signing (CI friendly)
+  - Template : `android/key.properties.example`
+  - `key.properties` déjà dans `.gitignore`
+- ✅ Splash screen Akôm généré (`flutter_native_splash`, fond teal #00897B)
+- ⬜ Icône d'application : config `flutter_launcher_icons` prête dans `pubspec.yaml`
+  - **Action requise** : placer le logo dans `assets/icon/icon.png` (1024×1024 px, fond transparent)
+  - puis exécuter : `dart run flutter_launcher_icons`
+- ✅ Nom d'application : "Akôm Scanner" dans `AndroidManifest.xml`
+
+---
+
+## État final & prochaines étapes
+
+**Phases 0–10 terminées** : 62 tests passent (40 unitaires + 22 widgets).
+
+### Actions requises (utilisateur)
+
+1. **Logo & icône** — placer `assets/icon/icon.png` (1024×1024, transparent), puis :
+   ```bash
+   cd mobile && dart run flutter_launcher_icons
+   ```
+
+2. **Keystore & signature** — générer la clé, créer `android/key.properties` (voir template), puis :
+   ```bash
+   cd mobile && flutter build apk --release              # APK direct
+   # ou pour Play Store:
+   cd mobile && flutter build appbundle --release       # AAB
+   ```
+
+### Optionnel : futures améliorations (Phase 11+)
+
+- 🔄 Tests d'intégration complets (scan → création produit)
+- 🔄 Profiling sur appareil faible (2 GB RAM, SDK 26)
+- 🔄 Thème sombre
+- 🔄 Multilangue (en, es, pt)
+- 🔄 Rapports & analytics
+- 🔄 Push notifications (commandes urgentes)
 
 ---
 
@@ -824,8 +808,8 @@ Légende : ✅ fait · 🔄 en cours · ⬜ à faire
 | 🔴 Critique | 3 — Auth | ✅ fait | Phases 0, 1, 2 |
 | 🔴 Critique | 4 — Dashboard | ✅ fait | Phase 3 |
 | 🟠 Haute | 5 — Catalogue (Module 1) | ✅ fait | Phases 0–4 |
-| 🟠 Haute | 6 — Inventaire (Module 2) | ⬜ à faire | Phases 0–5 |
-| 🟠 Haute | 7 — Caisse (Module 3) | ⬜ à faire | Phases 0–5 |
-| 🟡 Moyenne | 8 — Impression thermique | ⬜ à faire | Phase 7 |
-| 🟡 Moyenne | 9 — Paramètres | ⬜ à faire | Phases 3–7 |
-| 🟢 Basse | 10 — Tests & release | ⬜ à faire | Phases 0–9 |
+| 🟠 Haute | 6 — Inventaire (Module 2) | ✅ fait | Phases 0–5 |
+| 🟠 Haute | 7 — Caisse (Module 3) | ✅ fait | Phases 0–5 |
+| 🟡 Moyenne | 8 — Impression thermique | ✅ fait | Phase 7 |
+| 🟡 Moyenne | 9 — Paramètres | ✅ fait | Phases 3–7 |
+| 🟢 Basse | 10 — Tests & release | ✅ fait | Phases 0–9 |

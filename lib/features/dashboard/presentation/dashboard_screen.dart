@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/network/connectivity.dart';
 import '../../../core/storage/local_storage.dart';
-import '../../../features/auth/data/auth_provider.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/widgets/error_banner.dart';
 
@@ -21,20 +20,9 @@ class DashboardScreen extends ConsumerWidget {
         title: Text(restaurantName, overflow: TextOverflow.ellipsis),
         actions: [
           IconButton(
-            icon: const Icon(Icons.store_outlined),
-            tooltip: 'Changer de restaurant',
-            onPressed: () async {
-              await ref.read(localStorageProvider).saveRestaurant(
-                    id: '',
-                    name: '',
-                  );
-              if (context.mounted) context.go('/restaurants');
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: 'Se déconnecter',
-            onPressed: () => _signOut(context, ref),
+            icon: const Icon(Icons.settings_outlined),
+            tooltip: 'Paramètres',
+            onPressed: () => context.push('/settings'),
           ),
         ],
       ),
@@ -99,9 +87,7 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _signOut(BuildContext context, WidgetRef ref) async {
-    await ref.read(authRepositoryProvider).signOut();
-  }
+
 }
 
 class _ModuleTile extends StatelessWidget {

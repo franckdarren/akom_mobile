@@ -18,11 +18,15 @@ class LocalStorage {
   static const _keyRefreshToken = 'refresh_token';
   static const _keyRestaurantId = 'restaurant_id';
   static const _keyRestaurantName = 'restaurant_name';
+  static const _keyPrinterAddress = 'printer_address';
+  static const _keyPrinterName = 'printer_name';
 
   String? get accessToken => _prefs.getString(_keyAccessToken);
   String? get refreshToken => _prefs.getString(_keyRefreshToken);
   String? get restaurantId => _prefs.getString(_keyRestaurantId);
   String? get restaurantName => _prefs.getString(_keyRestaurantName);
+  String? get printerAddress => _prefs.getString(_keyPrinterAddress);
+  String? get printerName => _prefs.getString(_keyPrinterName);
 
   Future<void> saveTokens({
     required String accessToken,
@@ -41,12 +45,28 @@ class LocalStorage {
     ]);
   }
 
+  Future<void> savePrinter({required String address, required String name}) async {
+    await Future.wait([
+      _prefs.setString(_keyPrinterAddress, address),
+      _prefs.setString(_keyPrinterName, name),
+    ]);
+  }
+
+  Future<void> clearPrinter() async {
+    await Future.wait([
+      _prefs.remove(_keyPrinterAddress),
+      _prefs.remove(_keyPrinterName),
+    ]);
+  }
+
   Future<void> clearAll() async {
     await Future.wait([
       _prefs.remove(_keyAccessToken),
       _prefs.remove(_keyRefreshToken),
       _prefs.remove(_keyRestaurantId),
       _prefs.remove(_keyRestaurantName),
+      _prefs.remove(_keyPrinterAddress),
+      _prefs.remove(_keyPrinterName),
     ]);
   }
 }

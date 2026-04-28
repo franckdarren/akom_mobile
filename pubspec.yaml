@@ -39,9 +39,9 @@ dependencies:
   pdf: ^3.11.1
   printing: ^5.14.0
 
-  # Impression thermique Bluetooth — ajoutés en Phase 8
-  # flutter_thermal_printer: ^x.x.x
-  # esc_pos_utils_plus: ^x.x.x
+  # Impression thermique Bluetooth (Phase 8)
+  flutter_thermal_printer: ^2.0.1
+  esc_pos_utils_plus: ^2.0.3
 
   # Stockage local léger
   shared_preferences: ^2.3.5
@@ -68,6 +68,8 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^6.0.0
+  mocktail: ^1.0.4
+  sqlite3: any
 
   # Code generation
   build_runner: ^2.4.15
@@ -80,5 +82,33 @@ dev_dependencies:
   custom_lint: ^0.7.5
   riverpod_lint: ^2.6.3
 
+  # Icône & splash screen
+  flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.5
+
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/icon/
+
+# ── Configuration icône d'application ────────────────────────────────────────
+# Placer le logo dans assets/icon/icon.png (fond transparent, 1024×1024 px)
+# puis exécuter : dart run flutter_launcher_icons
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icon/icon.png"
+  adaptive_icon_background: "#00897B"  # Teal 600 (couleur primaire Akôm)
+  adaptive_icon_foreground: "assets/icon/icon_foreground.png"
+  min_sdk_android: 26
+
+# ── Configuration splash screen ───────────────────────────────────────────────
+# Exécuter : dart run flutter_native_splash:create
+flutter_native_splash:
+  color: "#00897B"          # Fond teal (couleur primaire Akôm)
+  color_dark: "#00695C"     # Variante sombre (teal 700)
+  android: true
+  ios: false
+  android_gravity: center
+  fullscreen: true
