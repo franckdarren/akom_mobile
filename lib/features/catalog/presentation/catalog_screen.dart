@@ -56,7 +56,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
         title: const Text('Catalogue'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/dashboard'),
+          onPressed: () => context.pop(),
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(

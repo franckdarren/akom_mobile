@@ -10,6 +10,15 @@ import 'core/storage/local_storage.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  if (Env.supabaseUrl.isEmpty ||
+      Env.supabaseAnonKey.isEmpty ||
+      Env.apiBaseUrl.isEmpty) {
+    throw StateError(
+      'Variables d\'environnement manquantes (SUPABASE_URL / SUPABASE_ANON_KEY / '
+      'API_BASE_URL). Lancez avec --dart-define-from-file=.env.development.',
+    );
+  }
+
   await Supabase.initialize(
     url: Env.supabaseUrl,
     anonKey: Env.supabaseAnonKey,

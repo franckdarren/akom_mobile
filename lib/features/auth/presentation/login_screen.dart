@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/errors/app_exception.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/widgets/akom_button.dart';
+import '../../../shared/widgets/akom_logo.dart';
 import '../../../shared/widgets/akom_text_field.dart';
 import '../../../shared/widgets/error_banner.dart';
 import '../data/auth_provider.dart';
@@ -163,27 +164,14 @@ class _Logo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
-          width: 72,
-          height: 72,
-          decoration: BoxDecoration(
-            color: AkomColors.primary,
-            borderRadius: AkomRadius.borderLg,
+        const AkomLogo(fontSize: 36),
+        const SizedBox(height: AkomSpacing.xs),
+        Text(
+          'SCANNER',
+          style: AkomTextStyles.labelLarge.copyWith(
+            color: AkomColors.onSurfaceVariant,
+            letterSpacing: 3,
           ),
-          alignment: Alignment.center,
-          child: const Text(
-            'A',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 40,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ),
-        const SizedBox(height: AkomSpacing.md),
-        const Text(
-          'Akôm Scanner',
-          style: AkomTextStyles.headlineSmall,
         ),
       ],
     );

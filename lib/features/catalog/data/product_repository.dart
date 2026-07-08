@@ -44,11 +44,11 @@ class ProductRepository {
         '/products',
         queryParameters: {
           'limit': limit,
-          if (cursor != null) 'cursor': cursor,
+          'cursor': ?cursor,
         },
       );
       final data = response.data!;
-      final list = (data['products'] as List<dynamic>)
+      final list = (data['items'] as List<dynamic>)
           .cast<Map<String, dynamic>>()
           .map(_parseProduct)
           .toList();

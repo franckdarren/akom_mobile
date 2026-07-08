@@ -55,7 +55,7 @@ class DashboardScreen extends ConsumerWidget {
                             title: 'Catalogue',
                             subtitle: 'Gérer vos produits et codes-barres',
                             color: AkomColors.primary,
-                            onTap: () => context.go('/catalog'),
+                            onTap: () => context.push('/catalog'),
                           ),
                           const SizedBox(height: AkomSpacing.md),
                           _ModuleTile(
@@ -63,7 +63,7 @@ class DashboardScreen extends ConsumerWidget {
                             title: 'Inventaire',
                             subtitle: 'Compter et ajuster votre stock',
                             color: AkomColors.secondary,
-                            onTap: () => context.go('/inventory'),
+                            onTap: () => context.push('/inventory'),
                           ),
                           const SizedBox(height: AkomSpacing.md),
                           _ModuleTile(
@@ -71,7 +71,7 @@ class DashboardScreen extends ConsumerWidget {
                             title: 'Caisse',
                             subtitle: 'Enregistrer des ventes',
                             color: const Color(0xFF1565C0),
-                            onTap: () => context.go('/pos'),
+                            onTap: () => context.push('/pos'),
                           ),
                         ],
                       ),

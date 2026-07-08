@@ -1,4 +1,4 @@
-package com.example.mobile
+package com.akom.scanner
 
 import io.flutter.embedding.android.FlutterActivity
 

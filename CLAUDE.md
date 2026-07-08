@@ -353,13 +353,24 @@ class Env {
 }
 ```
 
+Le fichier `.env.development` (racine du projet, `KEY=VALUE` par ligne, jamais committé — voir `.gitignore`) centralise ces valeurs. `.env.development.example` documente les clés attendues sans les valeurs réelles.
+
 ```bash
-# Développement
-flutter run \
-  --dart-define=SUPABASE_URL=https://xxx.supabase.co \
-  --dart-define=SUPABASE_ANON_KEY=eyJ... \
-  --dart-define=API_BASE_URL=http://localhost:3000
+# Développement — lit .env.development via --dart-define-from-file
+flutter run --dart-define-from-file=.env.development
 ```
+
+`SUPABASE_URL` et `SUPABASE_ANON_KEY` doivent être identiques à `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` dans `akom_saas/.env` (même projet Supabase partagé). `API_BASE_URL` pointe vers le déploiement web accessible depuis l'appareil de test (ex: `https://akom-saas.vercel.app`).
+
+VS Code : la configuration `.vscode/launch.json` ("Akôm Scanner (dev)") est déjà branchée sur `--dart-define-from-file=.env.development` — lancer directement via Run and Debug.
+
+**Build release (APK)** : `.env.production` (mêmes clés, même backend — il n'existe qu'un seul environnement Supabase/API) doit être fourni de la même façon. Un simple `flutter build apk --release` sans `--dart-define-from-file` reproduit le crash "baseUrl invalide" car `Env.*` retombe à des chaînes vides.
+
+```bash
+flutter build apk --release --dart-define-from-file=.env.production
+```
+
+VS Code : tâche `.vscode/tasks.json` ("Build APK (production)", Ctrl+Shift+B) déjà configurée avec ce flag.
 
 ---
 

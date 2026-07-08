@@ -117,7 +117,7 @@ final productsProvider =
 // ── Formulaire produit ────────────────────────────────────────────────────
 
 class ProductFormNotifier extends StateNotifier<ProductDraft> {
-  ProductFormNotifier(ProductDraft initial) : super(initial);
+  ProductFormNotifier(super.initial);
 
   void update(ProductDraft draft) => state = draft;
   void setName(String v) => state = state.copyWith(name: v);
