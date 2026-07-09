@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as sb;
 
 import '../../../core/errors/app_exception.dart';
 import '../../../shared/theme/app_theme.dart';
@@ -95,6 +97,10 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
     });
 
     try {
+      if (_localImagePath != null) {
+        _imageUrl = await _uploadImage(_localImagePath!);
+        _localImagePath = null;
+      }
       final draft = _buildDraft();
       final repo = ref.read(productRepositoryProvider);
       late ProductModel saved;
@@ -119,9 +125,26 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
       }
     } on AppException catch (e) {
       if (mounted) setState(() => _error = e.message);
+    } on sb.StorageException catch (e) {
+      if (mounted) {
+        setState(() => _error = "Échec de l'envoi de la photo : ${e.message}");
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  /// Upload vers le bucket Supabase Storage `products` (même bucket que le
+  /// web, cf. `components/image-uploader.tsx` dans akom_saas) et retourne
+  /// l'URL publique à envoyer à l'API.
+  Future<String> _uploadImage(String localPath) async {
+    final ext = localPath.split('.').last;
+    final random = Random().nextInt(1 << 32).toRadixString(36);
+    final fileName = '$random-${DateTime.now().millisecondsSinceEpoch}.$ext';
+
+    final storage = sb.Supabase.instance.client.storage.from('products');
+    await storage.upload(fileName, File(localPath));
+    return storage.getPublicUrl(fileName);
   }
 
   Future<void> _pickImage() async {
