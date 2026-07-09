@@ -277,78 +277,100 @@ class _CountEntryPanel extends StatelessWidget {
 
     return Container(
       color: AkomColors.background,
-      padding: const EdgeInsets.all(AkomSpacing.md),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SizedBox(height: AkomSpacing.md),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(AkomSpacing.md),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(item.productName, style: AkomTextStyles.headlineSmall),
-                  if (item.barcode != null)
-                    Text(
-                      item.barcode!,
-                      style: AkomTextStyles.bodySmall,
-                    ),
-                  const SizedBox(height: AkomSpacing.md),
-                  Row(
-                    children: [
-                      const Icon(Icons.inventory_2_outlined,
-                          size: 16, color: AkomColors.onSurfaceVariant),
-                      const SizedBox(width: AkomSpacing.xs),
-                      Flexible(
-                        child: Text(
-                          'Stock théorique : ${item.quantity}',
-                          style: AkomTextStyles.bodyMedium,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+      child: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(AkomSpacing.md),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(AkomSpacing.md),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(item.productName,
+                                style: AkomTextStyles.headlineSmall),
+                            if (item.barcode != null)
+                              Text(
+                                item.barcode!,
+                                style: AkomTextStyles.bodySmall,
+                              ),
+                            const SizedBox(height: AkomSpacing.md),
+                            Row(
+                              children: [
+                                const Icon(Icons.inventory_2_outlined,
+                                    size: 16,
+                                    color: AkomColors.onSurfaceVariant),
+                                const SizedBox(width: AkomSpacing.xs),
+                                Flexible(
+                                  child: Text(
+                                    'Stock théorique : ${item.quantity}',
+                                    style: AkomTextStyles.bodyMedium,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
+                    ),
+                    const SizedBox(height: AkomSpacing.lg),
+                    Text('Quantité comptée', style: AkomTextStyles.titleLarge),
+                    const SizedBox(height: AkomSpacing.sm),
+                    TextField(
+                      controller: controller,
+                      focusNode: focusNode,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      style: AkomTextStyles.headlineLarge,
+                      textAlign: TextAlign.center,
+                      decoration: InputDecoration(
+                        hintText: '0',
+                        errorText: error,
+                        suffixText: 'unités',
+                      ),
+                      onSubmitted: (_) => onValidate(),
+                      onChanged: (_) => onChanged(),
+                    ),
+                    if (gap != null) ...[
+                      const SizedBox(height: AkomSpacing.sm),
+                      _GapIndicator(gap: gap),
                     ],
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AkomSpacing.md,
+                0,
+                AkomSpacing.md,
+                AkomSpacing.md,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.check),
+                    label: const Text('Valider et scanner suivant'),
+                    onPressed: onValidate,
+                  ),
+                  const SizedBox(height: AkomSpacing.sm),
+                  OutlinedButton(
+                    onPressed: onCancel,
+                    child: const Text('Annuler'),
                   ),
                 ],
               ),
             ),
-          ),
-          const SizedBox(height: AkomSpacing.lg),
-          Text('Quantité comptée', style: AkomTextStyles.titleLarge),
-          const SizedBox(height: AkomSpacing.sm),
-          TextField(
-            controller: controller,
-            focusNode: focusNode,
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            style: AkomTextStyles.headlineLarge,
-            textAlign: TextAlign.center,
-            decoration: InputDecoration(
-              hintText: '0',
-              errorText: error,
-              suffixText: 'unités',
-            ),
-            onSubmitted: (_) => onValidate(),
-            onChanged: (_) => onChanged(),
-          ),
-          if (gap != null) ...[
-            const SizedBox(height: AkomSpacing.sm),
-            _GapIndicator(gap: gap),
           ],
-          const Spacer(),
-          ElevatedButton.icon(
-            icon: const Icon(Icons.check),
-            label: const Text('Valider et scanner suivant'),
-            onPressed: onValidate,
-          ),
-          const SizedBox(height: AkomSpacing.sm),
-          OutlinedButton(
-            onPressed: onCancel,
-            child: const Text('Annuler'),
-          ),
-          const SizedBox(height: AkomSpacing.md),
-        ],
+        ),
       ),
     );
   }
