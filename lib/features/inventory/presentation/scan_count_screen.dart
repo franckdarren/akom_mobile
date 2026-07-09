@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../shared/theme/app_theme.dart';
+import '../../../shared/utils/scan_feedback.dart';
 import '../../../shared/widgets/loading_overlay.dart';
 import '../data/inventory_providers.dart';
 import '../domain/stock_item_model.dart';
@@ -68,6 +69,7 @@ class _ScanCountScreenState extends ConsumerState<ScanCountScreen>
     final code = capture.barcodes.firstOrNull?.rawValue;
     if (code == null || code.isEmpty) return;
 
+    _unawaited(ScanFeedback.beep());
     setState(() => _isProcessing = true);
     _unawaited(_scanner.stop());
 
@@ -298,9 +300,13 @@ class _CountEntryPanel extends StatelessWidget {
                       const Icon(Icons.inventory_2_outlined,
                           size: 16, color: AkomColors.onSurfaceVariant),
                       const SizedBox(width: AkomSpacing.xs),
-                      Text(
-                        'Stock théorique : ${item.quantity}',
-                        style: AkomTextStyles.bodyMedium,
+                      Flexible(
+                        child: Text(
+                          'Stock théorique : ${item.quantity}',
+                          style: AkomTextStyles.bodyMedium,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ],
                   ),

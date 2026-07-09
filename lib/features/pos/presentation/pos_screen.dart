@@ -9,6 +9,7 @@ import '../../../features/catalog/data/catalog_providers.dart';
 import '../../../features/catalog/domain/product_model.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/fcfa_formatter.dart';
+import '../../../shared/utils/scan_feedback.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/error_banner.dart';
 import '../data/pos_providers.dart';
@@ -66,6 +67,7 @@ class _PosScreenState extends ConsumerState<PosScreen>
   Future<void> _onDetect(BarcodeCapture capture) async {
     final code = capture.barcodes.firstOrNull?.rawValue;
     if (code == null || code.isEmpty) return;
+    _unawaited(ScanFeedback.beep());
     _unawaited(_scanner.stop());
 
     final product = await ref

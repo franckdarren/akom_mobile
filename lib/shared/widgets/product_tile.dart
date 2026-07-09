@@ -63,15 +63,21 @@ class ProductTile extends StatelessWidget {
                     const SizedBox(height: AkomSpacing.sm),
                     Row(
                       children: [
-                        Text(
-                          formatFCFA(price),
-                          style: AkomTextStyles.price,
+                        Flexible(
+                          child: Text(
+                            formatFCFA(price),
+                            style: AkomTextStyles.price,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                         if (stock != null) ...[
                           const SizedBox(width: AkomSpacing.md),
-                          _StockBadge(
-                            stock: stock!,
-                            threshold: stockThreshold,
+                          Flexible(
+                            child: _StockBadge(
+                              stock: stock!,
+                              threshold: stockThreshold,
+                            ),
                           ),
                         ],
                       ],
@@ -191,6 +197,8 @@ class _StockBadge extends StatelessWidget {
           color: textColor,
           fontWeight: FontWeight.w600,
         ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }

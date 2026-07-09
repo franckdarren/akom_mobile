@@ -348,12 +348,20 @@ class _InfoRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label,
-            style: AkomTextStyles.bodyMedium
-                .copyWith(color: AkomColors.onSurfaceVariant)),
-        Text(
-          value,
-          style: AkomTextStyles.titleMedium.copyWith(color: valueColor),
+        Flexible(
+          child: Text(label,
+              style: AkomTextStyles.bodyMedium
+                  .copyWith(color: AkomColors.onSurfaceVariant)),
+        ),
+        const SizedBox(width: AkomSpacing.sm),
+        Flexible(
+          child: Text(
+            value,
+            style: AkomTextStyles.titleMedium.copyWith(color: valueColor),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.end,
+          ),
         ),
       ],
     );

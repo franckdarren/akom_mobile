@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../shared/theme/app_theme.dart';
+import '../../../shared/utils/scan_feedback.dart';
 import '../../../shared/widgets/loading_overlay.dart';
 import '../data/catalog_providers.dart';
 import '../domain/product_draft.dart';
@@ -56,6 +57,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen>
     final barcode = capture.barcodes.firstOrNull?.rawValue;
     if (barcode == null || barcode.isEmpty) return;
 
+    unawaited(ScanFeedback.beep());
     setState(() => _isProcessing = true);
     await _controller.stop();
 

@@ -120,11 +120,15 @@ class _InventorySummaryScreenState
                       Padding(
                         padding: const EdgeInsets.all(AkomSpacing.md),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            Text(
-                              'Total des écarts : $totalGap unité${totalGap > 1 ? 's' : ''}',
-                              style: AkomTextStyles.titleMedium,
+                            Expanded(
+                              child: Text(
+                                'Total des écarts : $totalGap unité${totalGap > 1 ? 's' : ''}',
+                                style: AkomTextStyles.titleMedium,
+                                textAlign: TextAlign.end,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                           ],
                         ),

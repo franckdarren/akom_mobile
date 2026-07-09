@@ -32,6 +32,9 @@ dependencies:
   # Scanner code-barres
   mobile_scanner: ^6.0.10
 
+  # Son de confirmation au scan
+  audioplayers: ^6.1.0
+
   # QR code
   qr_flutter: ^4.1.0
 
@@ -42,6 +45,9 @@ dependencies:
   # Impression thermique Bluetooth (Phase 8)
   flutter_thermal_printer: ^2.0.1
   esc_pos_utils_plus: ^2.0.3
+
+  # Variables d'environnement embarquées dans l'app
+  flutter_dotenv: ^5.2.1
 
   # Stockage local léger
   shared_preferences: ^2.3.5
@@ -55,9 +61,6 @@ dependencies:
   # Images
   cached_network_image: ^3.4.1
   image_picker: ^1.1.2
-
-  # Ouverture de liens externes
-  url_launcher: ^6.3.1
 
   # Code generation (modèles)
   freezed_annotation: ^3.0.0
@@ -91,6 +94,9 @@ flutter:
 
   assets:
     - assets/icon/
+    - assets/sounds/
+    - .env.development
+    - .env.production
 
 # ── Configuration icône d'application ────────────────────────────────────────
 # Logo aligné sur la charte web (même wordmark que components/ui/logo.tsx et favicon.svg)

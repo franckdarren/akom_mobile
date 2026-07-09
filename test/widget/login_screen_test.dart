@@ -31,11 +31,6 @@ void main() {
       await tester.pumpWidget(_wrap());
       expect(find.text('Akôm Scanner'), findsOneWidget);
     });
-
-    testWidgets('affiche le lien Créer un compte', (tester) async {
-      await tester.pumpWidget(_wrap());
-      expect(find.text('Créer un compte'), findsOneWidget);
-    });
   });
 
   group('LoginScreen — validation formulaire', () {

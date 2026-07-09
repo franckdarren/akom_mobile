@@ -342,35 +342,41 @@ formatFCFA(25000)  // "25 000 FCFA"
 
 ## Variables d'environnement
 
-Passées via `--dart-define` au build, jamais committées.
+Chargées au runtime via `flutter_dotenv`, jamais committées. Le fichier `.env`
+correspondant est déclaré comme **asset** dans `pubspec.yaml` et donc **embarqué
+dans l'APK** au build — aucun flag `--dart-define` n'est nécessaire, quelle que
+soit la méthode de lancement (terminal, bouton Run d'un IDE, APK partagé).
 
 ```dart
 // lib/core/env/env.dart
 class Env {
-  static const supabaseUrl = String.fromEnvironment('SUPABASE_URL');
-  static const supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
-  static const apiBaseUrl = String.fromEnvironment('API_BASE_URL');
+  static Future<void> load() => dotenv.load(
+        fileName: kReleaseMode ? '.env.production' : '.env.development',
+      );
+
+  static String get supabaseUrl => dotenv.env['SUPABASE_URL'] ?? '';
+  static String get supabaseAnonKey => dotenv.env['SUPABASE_ANON_KEY'] ?? '';
+  static String get apiBaseUrl => dotenv.env['API_BASE_URL'] ?? '';
 }
 ```
 
-Le fichier `.env.development` (racine du projet, `KEY=VALUE` par ligne, jamais committé — voir `.gitignore`) centralise ces valeurs. `.env.development.example` documente les clés attendues sans les valeurs réelles.
+`main.dart` appelle `await Env.load()` avant `Supabase.initialize()`. Le fichier
+chargé dépend automatiquement du mode de build (`kReleaseMode`) :
+`.env.development` en debug, `.env.production` en release — donc `flutter run`
+et `flutter build apk --release` fonctionnent sans aucun flag.
+
+Le fichier `.env.development` (racine du projet, `KEY=VALUE` par ligne, jamais committé — voir `.gitignore`) centralise ces valeurs. `.env.development.example` documente les clés attendues sans les valeurs réelles. `.env.production` suit le même format (mêmes clés, même backend — il n'existe qu'un seul environnement Supabase/API).
 
 ```bash
-# Développement — lit .env.development via --dart-define-from-file
-flutter run --dart-define-from-file=.env.development
+flutter run                        # dev — charge .env.development
+flutter build apk --release        # release — charge .env.production, embarqué dans l'APK
 ```
 
 `SUPABASE_URL` et `SUPABASE_ANON_KEY` doivent être identiques à `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` dans `akom_saas/.env` (même projet Supabase partagé). `API_BASE_URL` pointe vers le déploiement web accessible depuis l'appareil de test (ex: `https://akom-saas.vercel.app`).
 
-VS Code : la configuration `.vscode/launch.json` ("Akôm Scanner (dev)") est déjà branchée sur `--dart-define-from-file=.env.development` — lancer directement via Run and Debug.
+VS Code : la configuration `.vscode/launch.json` ("Akôm Scanner (dev)") et la tâche `.vscode/tasks.json` ("Build APK (production)", Ctrl+Shift+B) n'ont plus besoin de flag particulier.
 
-**Build release (APK)** : `.env.production` (mêmes clés, même backend — il n'existe qu'un seul environnement Supabase/API) doit être fourni de la même façon. Un simple `flutter build apk --release` sans `--dart-define-from-file` reproduit le crash "baseUrl invalide" car `Env.*` retombe à des chaînes vides.
-
-```bash
-flutter build apk --release --dart-define-from-file=.env.production
-```
-
-VS Code : tâche `.vscode/tasks.json` ("Build APK (production)", Ctrl+Shift+B) déjà configurée avec ce flag.
+**Sécurité** : seules des clés publiques/client (anon key) transitent par ce fichier — jamais de `service_role`. C'est le même principe que la clé anonyme Supabase déjà exposée côté web ; l'embarquer dans l'APK n'introduit pas de risque supplémentaire (elle est de toute façon protégée par les policies RLS côté Supabase).
 
 ---
 
@@ -608,7 +614,6 @@ Légende : ✅ fait · 🔄 en cours · ⬜ à faire
   - ✅ Bouton "Se connecter"
   - ✅ Gestion erreur (identifiants incorrects, réseau)
   - ✅ État de chargement
-  - ✅ Lien "Créer un compte sur akom.app" (ouvre navigateur)
 - ✅ `lib/features/auth/presentation/restaurant_picker_screen.dart`
   - ✅ Liste des restaurants accessibles
   - ✅ Sélection → stockage `restaurantId` → navigation Dashboard

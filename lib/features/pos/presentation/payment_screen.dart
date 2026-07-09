@@ -167,14 +167,22 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Monnaie à rendre',
-                            style: AkomTextStyles.titleMedium),
-                        Text(
-                          formatFCFA(_change),
-                          style: const TextStyle(
-                              color: AkomColors.success,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700),
+                        const Flexible(
+                          child: Text('Monnaie à rendre',
+                              style: AkomTextStyles.titleMedium),
+                        ),
+                        const SizedBox(width: AkomSpacing.sm),
+                        Flexible(
+                          child: Text(
+                            formatFCFA(_change),
+                            style: const TextStyle(
+                                color: AkomColors.success,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.end,
+                          ),
                         ),
                       ],
                     ),

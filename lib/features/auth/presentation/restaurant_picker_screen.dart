@@ -11,18 +11,27 @@ import '../../../shared/widgets/loading_overlay.dart';
 import '../data/auth_provider.dart';
 import '../domain/restaurant_model.dart';
 
-class RestaurantPickerScreen extends ConsumerWidget {
+class RestaurantPickerScreen extends ConsumerStatefulWidget {
   const RestaurantPickerScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<RestaurantPickerScreen> createState() =>
+      _RestaurantPickerScreenState();
+}
+
+class _RestaurantPickerScreenState
+    extends ConsumerState<RestaurantPickerScreen> {
+  bool _isSelecting = false;
+
+  @override
+  Widget build(BuildContext context) {
     final restaurantsAsync = ref.watch(restaurantsProvider);
 
     // Auto-sélection si un seul restaurant
     ref.listen(restaurantsProvider, (_, next) {
-      next.whenData((restaurants) async {
+      next.whenData((restaurants) {
         if (restaurants.length == 1) {
-          await _selectRestaurant(context, ref, restaurants.first);
+          _selectRestaurant(restaurants.first);
         }
       });
     });
@@ -35,55 +44,69 @@ class RestaurantPickerScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Se déconnecter',
-            onPressed: () => _signOut(context, ref),
+            onPressed: _isSelecting ? null : _signOut,
           ),
         ],
       ),
-      body: restaurantsAsync.when(
-        loading: () => const Center(child: InlineLoader()),
-        error: (error, _) => _ErrorBody(
-          message: error.toString(),
-          onRetry: () => ref.invalidate(restaurantsProvider),
-        ),
-        data: (restaurants) {
-          if (restaurants.isEmpty) {
-            return EmptyState(
-              icon: Icons.store_outlined,
-              title: 'Aucun restaurant',
-              subtitle:
-                  'Votre compte n\'est associé à aucun restaurant.\nContactez votre administrateur sur akom.app.',
-              action: () => _signOut(context, ref),
-              actionLabel: 'Se déconnecter',
+      body: LoadingOverlay(
+        isLoading: _isSelecting,
+        message: 'Sélection du restaurant…',
+        child: restaurantsAsync.when(
+          loading: () => const Center(child: InlineLoader()),
+          error: (error, _) => _ErrorBody(
+            message: error.toString(),
+            onRetry: () => ref.invalidate(restaurantsProvider),
+          ),
+          data: (restaurants) {
+            if (restaurants.isEmpty) {
+              return EmptyState(
+                icon: Icons.store_outlined,
+                title: 'Aucun restaurant',
+                subtitle:
+                    'Votre compte n\'est associé à aucun restaurant.\nContactez votre administrateur sur akom.app.',
+                action: _signOut,
+                actionLabel: 'Se déconnecter',
+              );
+            }
+
+            // Si un seul restaurant, affiche un loader pendant l'auto-sélection
+            if (restaurants.length == 1) {
+              return const Center(child: InlineLoader());
+            }
+
+            return _RestaurantList(
+              restaurants: restaurants,
+              onSelect: _selectRestaurant,
             );
-          }
-
-          // Si un seul restaurant, affiche un loader pendant l'auto-sélection
-          if (restaurants.length == 1) {
-            return const Center(child: InlineLoader());
-          }
-
-          return _RestaurantList(
-            restaurants: restaurants,
-            onSelect: (r) => _selectRestaurant(context, ref, r),
-          );
-        },
+          },
+        ),
       ),
     );
   }
 
-  Future<void> _selectRestaurant(
-    BuildContext context,
-    WidgetRef ref,
-    RestaurantModel restaurant,
-  ) async {
-    await ref
-        .read(localStorageProvider)
-        .saveRestaurant(id: restaurant.id, name: restaurant.name);
+  Future<void> _selectRestaurant(RestaurantModel restaurant) async {
+    if (_isSelecting) return;
+    setState(() => _isSelecting = true);
+    try {
+      await ref
+          .read(localStorageProvider)
+          .saveRestaurant(id: restaurant.id, name: restaurant.name);
 
-    if (context.mounted) context.go('/dashboard');
+      if (mounted) context.go('/dashboard');
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isSelecting = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Impossible de sélectionner ce restaurant : $e'),
+            backgroundColor: AkomColors.error,
+          ),
+        );
+      }
+    }
   }
 
-  Future<void> _signOut(BuildContext context, WidgetRef ref) async {
+  Future<void> _signOut() async {
     await ref.read(authRepositoryProvider).signOut();
     // RouterAuthNotifier détecte le logout et GoRouter redirige vers /login
   }

@@ -91,7 +91,15 @@ class CartScreen extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text('Total', style: AkomTextStyles.headlineSmall),
-                      Text(formatFCFA(total), style: AkomTextStyles.priceLarge),
+                      Flexible(
+                        child: Text(
+                          formatFCFA(total),
+                          style: AkomTextStyles.priceLarge,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.end,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: AkomSpacing.md),
