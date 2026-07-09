@@ -19,48 +19,31 @@ class _InventorySummaryScreenState
     extends ConsumerState<InventorySummaryScreen> {
   bool _isSyncing = false;
   String? _syncError;
-  int _synced = 0;
-  int _total = 0;
   bool _done = false;
 
-  Future<void> _syncAll() async {
+  Future<void> _closeInventory() async {
     final entries = ref.read(inventorySessionProvider);
     if (entries.isEmpty) return;
 
     setState(() {
       _isSyncing = true;
       _syncError = null;
-      _synced = 0;
-      _total = entries.length;
       _done = false;
     });
 
-    final repo = ref.read(inventoryRepositoryProvider);
-    final errors = <String>[];
-
-    for (final entry in entries) {
-      try {
-        await repo.updateStock(
-          entry.stock.productId,
-          entry.countedQuantity,
-          note: 'Inventaire mobile',
-        );
-        setState(() => _synced++);
-      } on AppException catch (e) {
-        errors.add('${entry.stock.productName} : ${e.message}');
-      }
-    }
-
-    if (errors.isEmpty) {
+    try {
+      await ref.read(inventoryRepositoryProvider).closeInventory(
+            entries: entries,
+          );
       ref.read(inventorySessionProvider.notifier).clear();
       setState(() {
         _isSyncing = false;
         _done = true;
       });
-    } else {
+    } on AppException catch (e) {
       setState(() {
         _isSyncing = false;
-        _syncError = errors.join('\n');
+        _syncError = e.message;
       });
     }
   }
@@ -154,31 +137,33 @@ class _InventorySummaryScreenState
                       ),
                     ),
                   if (_done)
-                    _DoneBanner(onReturn: () => context.go('/inventory'))
+                    _DoneBanner(onReturn: () => context.pop())
                   else ...[
                     if (_isSyncing)
-                      Column(
-                        children: [
-                          LinearProgressIndicator(
-                            value: _total > 0 ? _synced / _total : null,
-                            color: AkomColors.primary,
-                          ),
-                          const SizedBox(height: AkomSpacing.sm),
-                          Text(
-                            'Synchronisation $_synced / $_total…',
-                            textAlign: TextAlign.center,
-                            style: AkomTextStyles.bodySmall,
-                          ),
-                          const SizedBox(height: AkomSpacing.sm),
-                        ],
+                      const Padding(
+                        padding: EdgeInsets.only(bottom: AkomSpacing.sm),
+                        child: Column(
+                          children: [
+                            LinearProgressIndicator(
+                              color: AkomColors.primary,
+                            ),
+                            SizedBox(height: AkomSpacing.sm),
+                            Text(
+                              'Clôture de l\'inventaire…',
+                              textAlign: TextAlign.center,
+                              style: AkomTextStyles.bodySmall,
+                            ),
+                          ],
+                        ),
                       ),
                     ElevatedButton.icon(
                       icon: const Icon(Icons.cloud_upload_outlined),
                       label: Text(_syncError != null
                           ? 'Réessayer'
-                          : 'Envoyer les ajustements'),
-                      onPressed:
-                          (_isSyncing || entries.isEmpty) ? null : _syncAll,
+                          : 'Clôturer l\'inventaire'),
+                      onPressed: (_isSyncing || entries.isEmpty)
+                          ? null
+                          : _closeInventory,
                     ),
                     const SizedBox(height: AkomSpacing.sm),
                     OutlinedButton(
@@ -281,7 +266,7 @@ class _DoneBanner extends StatelessWidget {
               const SizedBox(width: AkomSpacing.sm),
               const Expanded(
                 child: Text(
-                  'Inventaire synchronisé avec succès !',
+                  'Inventaire clôturé et enregistré avec succès !',
                   style: TextStyle(color: AkomColors.success),
                 ),
               ),

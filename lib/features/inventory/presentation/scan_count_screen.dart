@@ -58,7 +58,10 @@ class _ScanCountScreenState extends ConsumerState<ScanCountScreen>
       case AppLifecycleState.hidden:
         _unawaited(_scanner.stop());
       case AppLifecycleState.resumed:
-        if (_currentItem == null) _unawaited(_scanner.start());
+        // Le scanner n'est monté que lorsque le stock est chargé.
+        if (_currentItem == null && ref.read(stockProvider).hasValue) {
+          _unawaited(_scanner.start());
+        }
       case AppLifecycleState.inactive:
         break;
     }
@@ -69,11 +72,15 @@ class _ScanCountScreenState extends ConsumerState<ScanCountScreen>
     final code = capture.barcodes.firstOrNull?.rawValue;
     if (code == null || code.isEmpty) return;
 
+    // Le stock n'est pas encore chargé (ou en erreur) : on ignore ce scan
+    // plutôt que de conclure à tort que le produit est introuvable.
+    final stockAsync = ref.read(stockProvider);
+    if (!stockAsync.hasValue) return;
+
     _unawaited(ScanFeedback.beep());
     setState(() => _isProcessing = true);
     _unawaited(_scanner.stop());
 
-    final stockAsync = ref.read(stockProvider);
     final items = stockAsync.valueOrNull ?? [];
 
     StockItem? found;
@@ -158,8 +165,7 @@ class _ScanCountScreenState extends ConsumerState<ScanCountScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Précharge le stock dès l'ouverture de l'écran
-    ref.watch(stockProvider);
+    final stockAsync = ref.watch(stockProvider);
     final session = ref.watch(inventorySessionProvider);
 
     return Scaffold(
@@ -204,46 +210,83 @@ class _ScanCountScreenState extends ConsumerState<ScanCountScreen>
                 onCancel: _cancelCurrent,
                 onChanged: () => setState(() {}),
               )
-            : Stack(
-                children: [
-                  MobileScanner(
-                    controller: _scanner,
-                    onDetect: _onDetect,
-                  ),
-                  // Viseur
-                  Center(
-                    child: Container(
-                      width: 240,
-                      height: 160,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: AkomColors.secondary, width: 2),
-                        borderRadius: AkomRadius.borderMd,
+            : stockAsync.when(
+                loading: () => const Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircularProgressIndicator(color: AkomColors.secondary),
+                      SizedBox(height: AkomSpacing.md),
+                      Text(
+                        'Chargement du stock…',
+                        style: TextStyle(color: Colors.white),
                       ),
+                    ],
+                  ),
+                ),
+                error: (_, _) => Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(AkomSpacing.lg),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.cloud_off, color: Colors.white, size: 40),
+                        const SizedBox(height: AkomSpacing.md),
+                        const Text(
+                          'Impossible de charger le stock. Vérifiez votre connexion.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        const SizedBox(height: AkomSpacing.md),
+                        ElevatedButton(
+                          onPressed: () => ref.invalidate(stockProvider),
+                          child: const Text('Réessayer'),
+                        ),
+                      ],
                     ),
                   ),
-                  // Indication
-                  Positioned(
-                    bottom: 48,
-                    left: 0,
-                    right: 0,
-                    child: Center(
+                ),
+                data: (_) => Stack(
+                  children: [
+                    MobileScanner(
+                      controller: _scanner,
+                      onDetect: _onDetect,
+                    ),
+                    // Viseur
+                    Center(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AkomSpacing.lg,
-                          vertical: AkomSpacing.sm,
-                        ),
+                        width: 240,
+                        height: 160,
                         decoration: BoxDecoration(
-                          color: Colors.black54,
-                          borderRadius: AkomRadius.borderFull,
-                        ),
-                        child: const Text(
-                          'Scannez un produit (code-barres ou QR Akôm)',
-                          style: TextStyle(color: Colors.white, fontSize: 13),
+                          border: Border.all(color: AkomColors.secondary, width: 2),
+                          borderRadius: AkomRadius.borderMd,
                         ),
                       ),
                     ),
-                  ),
-                ],
+                    // Indication
+                    Positioned(
+                      bottom: 48,
+                      left: 0,
+                      right: 0,
+                      child: Center(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AkomSpacing.lg,
+                            vertical: AkomSpacing.sm,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black54,
+                            borderRadius: AkomRadius.borderFull,
+                          ),
+                          child: const Text(
+                            'Scannez un produit (code-barres ou QR Akôm)',
+                            style: TextStyle(color: Colors.white, fontSize: 13),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
       ),
     );

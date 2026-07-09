@@ -188,7 +188,8 @@ class ReceiptScreen extends ConsumerWidget {
                       label: const Text('Nouvelle vente'),
                       onPressed: () {
                         ref.read(cartProvider.notifier).clearCart();
-                        context.go('/pos');
+                        context.pop(); // reçu -> panier
+                        context.pop(); // panier -> caisse
                       },
                     ),
                   ],

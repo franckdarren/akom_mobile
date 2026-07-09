@@ -47,3 +47,22 @@ class InventoryEntry {
         countedAt: DateTime.now(),
       );
 }
+
+class InventoryCloseResult {
+  InventoryCloseResult({
+    required this.sessionId,
+    required this.adjustedCount,
+    required this.totalGapQty,
+  });
+
+  factory InventoryCloseResult.fromJson(Map<String, dynamic> json) =>
+      InventoryCloseResult(
+        sessionId: json['sessionId'] as String,
+        adjustedCount: (json['adjustedCount'] as num).toInt(),
+        totalGapQty: (json['totalGapQty'] as num).toInt(),
+      );
+
+  final String sessionId;
+  final int adjustedCount;
+  final int totalGapQty;
+}

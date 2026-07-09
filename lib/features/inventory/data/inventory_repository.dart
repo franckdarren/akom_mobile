@@ -29,19 +29,27 @@ class InventoryRepository {
     }
   }
 
-  Future<void> updateStock(
-    String productId,
-    int quantity, {
-    String? note,
+  Future<InventoryCloseResult> closeInventory({
+    String? label,
+    required List<InventoryEntry> entries,
   }) async {
     try {
-      final body = <String, dynamic>{'quantity': quantity};
-      if (note != null) body['note'] = note;
-      await _dio.patch<void>('/stock/$productId', data: body);
+      final body = <String, dynamic>{
+        if (label != null && label.isNotEmpty) 'label': label,
+        'entries': entries
+            .map((e) => {
+                  'productId': e.stock.productId,
+                  'countedQty': e.countedQuantity,
+                })
+            .toList(),
+      };
+      final response =
+          await _dio.post<Map<String, dynamic>>('/inventory', data: body);
+      return InventoryCloseResult.fromJson(response.data!);
     } on DioException catch (e) {
       final appEx = e.error;
       if (appEx is AppException) throw appEx;
-      throw const NetworkException('Impossible de mettre à jour le stock.');
+      throw const NetworkException('Impossible de clôturer l\'inventaire.');
     }
   }
 }

@@ -160,7 +160,8 @@ headers: {
 | PATCH | /api/mobile/products/[id] | Modifier un produit |
 | GET | /api/mobile/products/barcode/[code] | Lookup produit par code-barres |
 | GET | /api/mobile/stock | Stock actuel |
-| PATCH | /api/mobile/stock/[productId] | Mettre à jour le stock |
+| PATCH | /api/mobile/stock/[productId] | Ajustement ponctuel d'un seul produit (hors inventaire) |
+| POST | /api/mobile/inventory | Clôturer un inventaire (crée une InventorySession + InventoryLine par produit compté) |
 | POST | /api/mobile/orders | Créer une commande (caisse) |
 | GET | /api/mobile/categories | Liste des catégories |
 
@@ -485,6 +486,17 @@ Légende : ✅ fait · 🔄 en cours · ⬜ à faire
   - Crée `Order(source: mobile_pos, status: delivered)` + `OrderItem` + `StockMovement(sale_manual)` en une transaction
   - Retourne `{ orderId, orderNumber, totalAmount }`
 
+#### W.7 Route : clôture d'inventaire
+
+- ✅ `POST web/app/api/mobile/inventory/route.ts`
+  - Body : `{ label?, entries: [{ productId, countedQty, note? }] }`
+  - Crée en une transaction une `InventorySession` (scope `operational`, status `completed`)
+    avec une `InventoryLine` par produit (snapshot `expectedQty`), applique les écarts au
+    `Stock` réel, journalise un `StockMovement(adjustment)` par produit avec écart non nul
+    et met à jour `Product.isAvailable` — équivalent mobile de `completeInventorySession()`
+    (`lib/actions/inventory.ts`)
+  - Retourne `{ sessionId, completedAt, linesCount, adjustedCount, totalGapQty }`
+
 ---
 
 ### Phase 0 — Configuration & infrastructure de base ✅ TERMINÉE
@@ -695,10 +707,12 @@ Légende : ✅ fait · 🔄 en cours · ⬜ à faire
 ### Phase 6 — Module 2 : Inventaire ✅ TERMINÉE
 
 #### 6.1 Domaine & données
-- ✅ `lib/features/inventory/domain/stock_item_model.dart` (`StockItem` + `InventoryEntry`)
+- ✅ `lib/features/inventory/domain/stock_item_model.dart` (`StockItem` + `InventoryEntry` + `InventoryCloseResult`)
 - ✅ `lib/features/inventory/data/inventory_repository.dart`
   - ✅ `getStock()` → GET `/stock`
-  - ✅ `updateStock(productId, quantity)` → PATCH `/stock/[productId]`
+  - ✅ `closeInventory({label?, entries})` → POST `/inventory` — clôture atomique : crée une
+    `InventorySession` + une `InventoryLine` par produit compté en une seule transaction
+    côté serveur (remplace l'ancienne boucle `PATCH /stock/[productId]` par produit)
 
 #### 6.2 Providers Riverpod
 - ✅ `inventorySessionProvider` (liste des scans en cours, `NotifierProvider`)
